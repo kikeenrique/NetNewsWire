@@ -82,6 +82,15 @@ final class MainFeedTableViewCell : VibrantTableViewCell {
 		}
 	}
 
+	var errorCount: Int = 0 {
+		didSet {
+			if errorCount != oldValue {
+				updateErrorIndicator()
+				setNeedsLayout()
+			}
+		}
+	}
+
 	private let titleView: UILabel = {
 		let label = NonIntrinsicLabel()
 		label.numberOfLines = 0
@@ -93,6 +102,13 @@ final class MainFeedTableViewCell : VibrantTableViewCell {
 	}()
 
 	private let iconView = IconView()
+
+	private let errorIndicatorView: UIImageView = {
+		let imageView = UIImageView()
+		imageView.contentMode = .scaleAspectFit
+		imageView.isHidden = true
+		return imageView
+	}()
 
 	private let bottomSeparatorView: UIView = {
 		let view = UIView()
@@ -136,13 +152,13 @@ final class MainFeedTableViewCell : VibrantTableViewCell {
 	}
 	
 	override func sizeThatFits(_ size: CGSize) -> CGSize {
-		let layout = MainFeedTableViewCellLayout(cellWidth: bounds.size.width, insets: safeAreaInsets, label: titleView, unreadCountView: unreadCountView, showingEditingControl: isShowingEditControl, indent: indentationLevel == 1, shouldShowDisclosure: isDisclosureAvailable)
+		let layout = MainFeedTableViewCellLayout(cellWidth: bounds.size.width, insets: safeAreaInsets, label: titleView, unreadCountView: unreadCountView, showingEditingControl: isShowingEditControl, indent: indentationLevel == 1, shouldShowDisclosure: isDisclosureAvailable, errorIndicatorView: errorIndicatorView)
 		return CGSize(width: bounds.width, height: layout.height)
 	}
-	
+
 	override func layoutSubviews() {
 		super.layoutSubviews()
-		let layout = MainFeedTableViewCellLayout(cellWidth: bounds.size.width, insets: safeAreaInsets, label: titleView, unreadCountView: unreadCountView, showingEditingControl: isShowingEditControl, indent: indentationLevel == 1, shouldShowDisclosure: isDisclosureAvailable)
+		let layout = MainFeedTableViewCellLayout(cellWidth: bounds.size.width, insets: safeAreaInsets, label: titleView, unreadCountView: unreadCountView, showingEditingControl: isShowingEditControl, indent: indentationLevel == 1, shouldShowDisclosure: isDisclosureAvailable, errorIndicatorView: errorIndicatorView)
 		layoutWith(layout)
 	}
 	
@@ -186,6 +202,7 @@ private extension MainFeedTableViewCell {
 		addSubviewAtInit(unreadCountView)
 		addSubviewAtInit(iconView)
 		addSubviewAtInit(titleView)
+		addSubviewAtInit(errorIndicatorView)
 		addDisclosureView()
 		addSubviewAtInit(bottomSeparatorView)
 	}
@@ -211,10 +228,31 @@ private extension MainFeedTableViewCell {
 	func layoutWith(_ layout: MainFeedTableViewCellLayout) {
 		iconView.setFrameIfNotEqual(layout.faviconRect)
 		titleView.setFrameIfNotEqual(layout.titleRect)
+		errorIndicatorView.setFrameIfNotEqual(layout.errorIndicatorRect)
 		unreadCountView.setFrameIfNotEqual(layout.unreadCountRect)
 		disclosureButton?.setFrameIfNotEqual(layout.disclosureButtonRect)
 		disclosureButton?.isHidden = !isDisclosureAvailable
 		bottomSeparatorView.setFrameIfNotEqual(layout.separatorRect)
+	}
+
+	func updateErrorIndicator() {
+		if errorCount >= 10 {
+			// Red X for broken feeds (10+ errors)
+			let config = UIImage.SymbolConfiguration(paletteColors: [.systemRed])
+			errorIndicatorView.image = UIImage(systemName: "xmark.circle.fill", withConfiguration: config)
+			errorIndicatorView.accessibilityLabel = "Broken feed"
+			errorIndicatorView.isHidden = false
+		} else if errorCount >= 3 {
+			// Yellow warning for problematic feeds (3-9 errors)
+			let config = UIImage.SymbolConfiguration(paletteColors: [.systemYellow])
+			errorIndicatorView.image = UIImage(systemName: "exclamationmark.triangle.fill", withConfiguration: config)
+			errorIndicatorView.accessibilityLabel = "Feed has errors"
+			errorIndicatorView.isHidden = false
+		} else {
+			// No indicator for healthy feeds (0-2 errors)
+			errorIndicatorView.isHidden = true
+			errorIndicatorView.image = nil
+		}
 	}
 
 	func hideView(_ view: UIView) {
