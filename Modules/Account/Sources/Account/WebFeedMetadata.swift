@@ -32,6 +32,9 @@ final class WebFeedMetadata: Codable {
 		case externalID = "subscriptionID"
 		case folderRelationship
 		case lastCheckDate
+		case lastSuccessfulCheckDate
+		case consecutiveErrorCount
+		case lastErrorMessage
 	}
 
 	var webFeedID: String {
@@ -158,6 +161,35 @@ final class WebFeedMetadata: Codable {
 		didSet {
 			if lastCheckDate != oldValue {
 				valueDidChange(.lastCheckDate)
+			}
+		}
+	}
+
+	/// Last time the feed was successfully updated.
+	/// (Successful means: downloaded, parsed, and articles updated.)
+	var lastSuccessfulCheckDate: Date? {
+		didSet {
+			if lastSuccessfulCheckDate != oldValue {
+				valueDidChange(.lastSuccessfulCheckDate)
+			}
+		}
+	}
+
+	/// Number of consecutive errors encountered when updating this feed.
+	/// Reset to 0 on successful update.
+	var consecutiveErrorCount: Int = 0 {
+		didSet {
+			if consecutiveErrorCount != oldValue {
+				valueDidChange(.consecutiveErrorCount)
+			}
+		}
+	}
+
+	/// User-friendly description of the last error that occurred.
+	var lastErrorMessage: String? {
+		didSet {
+			if lastErrorMessage != oldValue {
+				valueDidChange(.lastErrorMessage)
 			}
 		}
 	}
