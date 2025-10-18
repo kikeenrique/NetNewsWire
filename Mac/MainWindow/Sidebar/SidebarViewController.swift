@@ -789,6 +789,7 @@ private extension SidebarViewController {
 		cell.name = nameFor(node)
 		configureUnreadCount(cell, node)
 		configureFavicon(cell, node)
+		configureErrorCount(cell, node)
 		cell.shouldShowImage = node.representedObject is SmallIconProvider
 	}
 
@@ -798,6 +799,14 @@ private extension SidebarViewController {
 
 	func configureFavicon(_ cell: SidebarCell, _ node: Node) {
 		cell.iconImage = imageFor(node)
+	}
+
+	func configureErrorCount(_ cell: SidebarCell, _ node: Node) {
+		if let feed = node.representedObject as? WebFeed {
+			cell.errorCount = feed.metadata.consecutiveErrorCount
+		} else {
+			cell.errorCount = 0
+		}
 	}
 
 	func configureGroupCell(_ cell: NSTableCellView, _ node: Node) {
