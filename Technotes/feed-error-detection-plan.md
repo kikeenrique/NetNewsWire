@@ -599,11 +599,14 @@ Benefits: Easy cleanup of multiple dead feeds.
 
 ### Implementation Order
 
-1. ✅ **Phase 1**: Data model (WebFeedMetadata)
-2. ✅ **Phase 2**: Error tracking logic (LocalAccountRefresher)
-3. ✅ **Phase 3**: macOS UI (Sidebar + Inspector)
-4. ✅ **Phase 4**: iOS UI (mirror macOS)
-5. ⚠️ **Phase 5**: Optional notifications (if requested)
+1. ✅ **Phase 1**: Data model (WebFeedMetadata) - COMPLETE
+2. ✅ **Phase 2**: Error tracking logic (LocalAccountRefresher) - COMPLETE
+3. ✅ **Phase 3**: macOS UI (Sidebar + Inspector) - COMPLETE
+4. ✅ **Phase 4**: iOS UI (mirror macOS) - COMPLETE
+   - ✅ Phase 4.1: iOS Feed List Cells with error indicators
+   - ✅ Phase 4.2: iOS Feed Detail/Inspector View with health section
+   - ⏭️ Phase 4.3: iOS Tab Badge (optional - skipped for v1)
+5. ⚠️ **Phase 5**: Optional notifications (deferred - not implemented)
 
 ---
 
@@ -657,7 +660,114 @@ All stored in simple `lastErrorMessage` string for v1.
 
 ---
 
-**Document Version:** 1.0
+---
+
+## Implementation Summary
+
+**Status:** ✅ COMPLETE (Phases 1-4)
+
+### What Was Implemented
+
+#### Phase 1: Data Model (WebFeedMetadata)
+- Added 3 new fields to `WebFeedMetadata`:
+  - `lastSuccessfulCheckDate: Date?` - Tracks when feed last updated successfully
+  - `consecutiveErrorCount: Int` - Counts consecutive failures
+  - `lastErrorMessage: String?` - Stores user-friendly error description
+- Added public accessors on `WebFeed` for easy access
+- Fully backwards compatible with existing metadata files
+
+#### Phase 2: Error Tracking Logic (LocalAccountRefresher)
+- Modified `downloadSession(_:downloadDidComplete:)` to track all error types:
+  - Network errors (timeout, connectivity issues)
+  - HTTP 4xx/5xx errors
+  - Parse errors
+  - Database update errors
+- Errors increment `consecutiveErrorCount` and set `lastErrorMessage`
+- Successful updates reset counter to 0 and update `lastSuccessfulCheckDate`
+- HTTP 304 (Not Modified) correctly counts as success
+
+#### Phase 3: macOS UI
+**Sidebar Feed List** (`Mac/MainWindow/Sidebar/Cell/SidebarCell.swift`):
+- Added `errorCount` property and `errorIndicatorView`
+- Displays SF Symbol icons based on error count:
+  - 0-2 errors: No icon
+  - 3-9 errors: ⚠️ Yellow warning (`exclamationmark.triangle.fill`)
+  - 10+ errors: ❌ Red X (`xmark.circle.fill`)
+- Updated `SidebarCellLayout` to position error indicator
+- Updated `SidebarViewController` to set error counts from feeds
+
+**Feed Inspector** (`Mac/Inspector/WebFeedInspectorViewController.swift`):
+- Added "Feed Health" section (programmatically created)
+- Shows: status, last successful update, error count, last error message
+- Section only visible when `consecutiveErrorCount > 0`
+- Uses `RelativeDateTimeFormatter` for user-friendly time display
+
+#### Phase 4: iOS UI
+**Feed List Cells** (`iOS/MainFeed/Cell/MainFeedTableViewCell.swift`):
+- Mirrored macOS implementation with UIKit
+- Added `errorCount` property and `errorIndicatorView`
+- Same visual indicators (yellow warning, red X)
+- Updated `MainFeedTableViewCellLayout` to position indicator
+- Updated `MainFeedViewController` to configure error counts
+
+**Feed Inspector** (`iOS/Inspector/WebFeedInspectorViewController.swift`):
+- Mirrored macOS health section with UIKit
+- Programmatically created UIStackView with labels
+- Shows as additional table section when errors exist
+- Same information display as macOS version
+
+**Skipped:** iOS Tab Badge (Phase 4.3) - marked optional in plan
+
+### Files Modified
+
+#### Data Model
+- `Modules/Account/Sources/Account/WebFeedMetadata.swift`
+- `Modules/Account/Sources/Account/WebFeed.swift`
+
+#### Business Logic
+- `Modules/Account/Sources/Account/LocalAccount/LocalAccountRefresher.swift`
+
+#### macOS UI
+- `Mac/MainWindow/Sidebar/Cell/SidebarCell.swift`
+- `Mac/MainWindow/Sidebar/Cell/SidebarCellLayout.swift`
+- `Mac/MainWindow/Sidebar/SidebarViewController.swift`
+- `Mac/Inspector/WebFeedInspectorViewController.swift`
+
+#### iOS UI
+- `iOS/MainFeed/Cell/MainFeedTableViewCell.swift`
+- `iOS/MainFeed/Cell/MainFeedTableViewCellLayout.swift`
+- `iOS/MainFeed/MainFeedViewController.swift`
+- `iOS/Inspector/WebFeedInspectorViewController.swift`
+
+### Git Commits (on feature/feed-error-detection branch)
+
+1. `d4a11cd09` - Add error tracking fields to WebFeedMetadata
+2. `dc7e0ca45` - Track feed errors in LocalAccountRefresher
+3. `4ea1c3b61` - Add error indicators to sidebar feed list
+4. `f84212d8a` - Add Feed Health section to WebFeed Inspector
+5. `ae1e3e2c0` - Add public accessors and fix compilation errors
+6. `d1192907e` - Add iOS feed error indicators and health section
+
+### Testing Status
+
+- ✅ iOS build succeeds
+- ✅ macOS build succeeds
+- ⚠️ Manual testing required (no automated UI tests added)
+
+### Next Steps
+
+1. **Testing**: Manually test on both platforms with feeds that have errors
+2. **Code Review**: Have team review implementation
+3. **Merge**: Merge feature branch to main after approval
+4. **Future Enhancements** (if needed):
+   - Phase 5: Optional notifications for broken feeds
+   - Phase 4.3: iOS tab badge
+   - Advanced features from plan (error history, health score, etc.)
+
+---
+
+**Document Version:** 1.1
 **Created:** 2025-10-18
-**Purpose:** Implementation plan for feed error detection feature
-**Status:** Ready for implementation
+**Updated:** 2025-10-18
+**Purpose:** Implementation plan and summary for feed error detection feature
+**Status:** Implementation complete (Phases 1-4)
