@@ -296,7 +296,7 @@ private extension WebFeedInspectorViewController {
 			return
 		}
 
-		let errorCount = feed.metadata.consecutiveErrorCount
+		let errorCount = feed.consecutiveErrorCount
 
 		// Only show health section if there are errors
 		guard errorCount > 0 else {
@@ -308,18 +308,18 @@ private extension WebFeedInspectorViewController {
 
 		// Status
 		if errorCount >= 10 {
-			healthStatusLabel.stringValue = "Status: ❌ Broken"
+			healthStatusLabel.stringValue = "Status: Broken"
 			healthStatusLabel.textColor = .systemRed
 		} else if errorCount >= 3 {
-			healthStatusLabel.stringValue = "Status: ⚠️ Not updating"
+			healthStatusLabel.stringValue = "Status: Not updating"
 			healthStatusLabel.textColor = .systemOrange
 		} else {
-			healthStatusLabel.stringValue = "Status: ⚠️ Recent errors"
+			healthStatusLabel.stringValue = "Status: Recent errors"
 			healthStatusLabel.textColor = .systemYellow
 		}
 
 		// Last successful update
-		if let lastSuccess = feed.metadata.lastSuccessfulCheckDate {
+		if let lastSuccess = feed.lastSuccessfulCheckDate {
 			let formatter = RelativeDateTimeFormatter()
 			formatter.unitsStyle = .full
 			let timeString = formatter.localizedString(for: lastSuccess, relativeTo: Date())
@@ -332,7 +332,7 @@ private extension WebFeedInspectorViewController {
 		errorCountLabel.stringValue = "Consecutive errors: \(errorCount)"
 
 		// Last error message
-		if let errorMessage = feed.metadata.lastErrorMessage {
+		if let errorMessage = feed.lastErrorMessage {
 			lastErrorLabel.stringValue = "Last error: \(errorMessage)"
 		} else {
 			lastErrorLabel.stringValue = ""

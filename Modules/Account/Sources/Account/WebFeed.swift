@@ -206,6 +206,39 @@ public final class WebFeed: Feed, Renamable, Hashable {
 			metadata.lastCheckDate = newValue
 		}
 	}
+
+	/// Last time the feed was successfully updated.
+	/// (Successful means: downloaded, parsed, and articles updated.)
+	public var lastSuccessfulCheckDate: Date? {
+		get {
+			metadata.lastSuccessfulCheckDate
+		}
+		set {
+			metadata.lastSuccessfulCheckDate = newValue
+		}
+	}
+
+	/// Number of consecutive errors encountered when updating this feed.
+	/// Reset to 0 on successful update.
+	public var consecutiveErrorCount: Int {
+		get {
+			metadata.consecutiveErrorCount
+		}
+		set {
+			metadata.consecutiveErrorCount = newValue
+		}
+	}
+
+	/// User-friendly description of the last error that occurred.
+	public var lastErrorMessage: String? {
+		get {
+			metadata.lastErrorMessage
+		}
+		set {
+			metadata.lastErrorMessage = newValue
+		}
+	}
+
 	// MARK: - DisplayNameProvider
 
 	public var nameForDisplay: String {
