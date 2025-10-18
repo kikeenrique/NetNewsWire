@@ -16,30 +16,33 @@ struct MainFeedTableViewCellLayout {
 	private static let imageSize = CGSize(width: 24, height: 24)
 	private static let imageMarginRight = CGFloat(integerLiteral: 11)
 	private static let labelMarginRight = CGFloat(integerLiteral: 8)
+	private static let errorIndicatorSize = CGSize(width: 16, height: 16)
+	private static let errorIndicatorMarginRight = CGFloat(integerLiteral: 4)
 	private static let unreadCountMarginRight = CGFloat(integerLiteral: 16)
 	private static let disclosureButtonSize = CGSize(width: 44, height: 44)
 	private static let verticalPadding = CGFloat(integerLiteral: 11)
 
 	private static let minRowHeight = CGFloat(integerLiteral: 44)
-	
+
 	static let faviconCornerRadius = CGFloat(integerLiteral: 2)
 
 	let faviconRect: CGRect
 	let titleRect: CGRect
+	let errorIndicatorRect: CGRect
 	let unreadCountRect: CGRect
 	let disclosureButtonRect: CGRect
 	let separatorRect: CGRect
-	
+
 	let height: CGFloat
 	
-	init(cellWidth: CGFloat, insets: UIEdgeInsets, label: UILabel, unreadCountView: MainFeedUnreadCountView, showingEditingControl: Bool, indent: Bool, shouldShowDisclosure: Bool) {
+	init(cellWidth: CGFloat, insets: UIEdgeInsets, label: UILabel, unreadCountView: MainFeedUnreadCountView, showingEditingControl: Bool, indent: Bool, shouldShowDisclosure: Bool, errorIndicatorView: UIImageView) {
 
 		var initialIndent = insets.left
 		if indent {
 			initialIndent += MainFeedTableViewCellLayout.indentWidth
 		}
 		let bounds = CGRect(x: initialIndent, y: 0.0, width: floor(cellWidth - initialIndent - insets.right), height: 0.0)
-		
+
 		// Disclosure Button
 		var rDisclosure = CGRect.zero
 		if shouldShowDisclosure {
@@ -66,6 +69,18 @@ struct MainFeedTableViewCellLayout {
 			rUnread.size = unreadCountSize
 			rUnread.origin.x = bounds.maxX - (MainFeedTableViewCellLayout.unreadCountMarginRight + unreadCountSize.width)
 		}
+
+		// Error Indicator (between label and unread count)
+		let errorIndicatorIsHidden = errorIndicatorView.isHidden
+		var rErrorIndicator = CGRect.zero
+		if !errorIndicatorIsHidden {
+			rErrorIndicator.size = MainFeedTableViewCellLayout.errorIndicatorSize
+			if !unreadCountIsHidden {
+				rErrorIndicator.origin.x = rUnread.minX - MainFeedTableViewCellLayout.errorIndicatorMarginRight - MainFeedTableViewCellLayout.errorIndicatorSize.width
+			} else {
+				rErrorIndicator.origin.x = bounds.maxX - (MainFeedTableViewCellLayout.unreadCountMarginRight + MainFeedTableViewCellLayout.errorIndicatorSize.width)
+			}
+		}
 		
 		// Title
 		var rLabelx = insets.left + MainFeedTableViewCellLayout.disclosureButtonSize.width
@@ -73,9 +88,12 @@ struct MainFeedTableViewCellLayout {
 			rLabelx = rLabelx + MainFeedTableViewCellLayout.imageSize.width + MainFeedTableViewCellLayout.imageMarginRight
 		}
 		let rLabely = UIFontMetrics.default.scaledValue(for: MainFeedTableViewCellLayout.verticalPadding)
-		
+
 		var labelWidth = CGFloat.zero
-		if !unreadCountIsHidden {
+		if !errorIndicatorIsHidden {
+			// Label needs space for error indicator
+			labelWidth = cellWidth - (rLabelx + MainFeedTableViewCellLayout.labelMarginRight + (cellWidth - rErrorIndicator.minX))
+		} else if !unreadCountIsHidden {
 			labelWidth = cellWidth - (rLabelx + MainFeedTableViewCellLayout.labelMarginRight + (cellWidth - rUnread.minX))
 		} else {
 			labelWidth = cellWidth - (rLabelx + MainFeedTableViewCellLayout.labelMarginRight)
@@ -90,7 +108,11 @@ struct MainFeedTableViewCellLayout {
 			rDisclosure.origin.x += MainFeedTableViewCellLayout.editingControlIndent
 			rFavicon.origin.x += MainFeedTableViewCellLayout.editingControlIndent
 			rLabelx += MainFeedTableViewCellLayout.editingControlIndent
-			if !unreadCountIsHidden {
+			if !errorIndicatorIsHidden {
+				rErrorIndicator.origin.x -= MainFeedTableViewCellLayout.editingControlIndent
+				rUnread.origin.x -= MainFeedTableViewCellLayout.editingControlIndent
+				labelWidth = cellWidth - (rLabelx + MainFeedTableViewCellLayout.labelMarginRight + (cellWidth - rErrorIndicator.minX))
+			} else if !unreadCountIsHidden {
 				rUnread.origin.x -= MainFeedTableViewCellLayout.editingControlIndent
 				labelWidth = cellWidth - (rLabelx + MainFeedTableViewCellLayout.labelMarginRight + (cellWidth - rUnread.minX))
 			} else {
@@ -102,16 +124,19 @@ struct MainFeedTableViewCellLayout {
 		
 		// Determine cell height
 		let paddedLabelHeight = rLabel.maxY + UIFontMetrics.default.scaledValue(for: MainFeedTableViewCellLayout.verticalPadding)
-		let maxGraphicsHeight = [rFavicon, rUnread, rDisclosure].maxY()
+		let maxGraphicsHeight = [rFavicon, rUnread, rErrorIndicator, rDisclosure].maxY()
 		var cellHeight = max(paddedLabelHeight, maxGraphicsHeight)
 		if cellHeight < MainFeedTableViewCellLayout.minRowHeight {
 			cellHeight = MainFeedTableViewCellLayout.minRowHeight
 		}
-		
+
 		// Center in Cell
 		let newBounds = CGRect(x: bounds.origin.x, y: bounds.origin.y, width: bounds.width, height: cellHeight)
 		if !unreadCountIsHidden {
 			rUnread = MainFeedTableViewCellLayout.centerVertically(rUnread, newBounds)
+		}
+		if !errorIndicatorIsHidden {
+			rErrorIndicator = MainFeedTableViewCellLayout.centerVertically(rErrorIndicator, newBounds)
 		}
 		if shouldShowDisclosure {
 			rDisclosure = MainFeedTableViewCellLayout.centerVertically(rDisclosure, newBounds)
@@ -126,14 +151,15 @@ struct MainFeedTableViewCellLayout {
 		//  Separator Insets
 		let separatorInset = MainFeedTableViewCellLayout.disclosureButtonSize.width
 		separatorRect = CGRect(x: separatorInset, y: cellHeight - 0.5, width: cellWidth - separatorInset, height: 0.5)
-		
+
 		//  Assign the properties
 		self.height = cellHeight
 		self.faviconRect = rFavicon
+		self.titleRect = rLabel
+		self.errorIndicatorRect = rErrorIndicator
 		self.unreadCountRect = rUnread
 		self.disclosureButtonRect = rDisclosure
-		self.titleRect = rLabel
-		
+
 	}
 	
 	// Ideally this will be implemented in RSCore (see RSGeometry)

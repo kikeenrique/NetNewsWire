@@ -806,11 +806,14 @@ private extension MainFeedViewController {
 	func resetEstimatedRowHeight() {
 		let titleLabel = NonIntrinsicLabel()
 		titleLabel.text = "But I must explain"
-		
+
 		let unreadCountView = MainFeedUnreadCountView()
 		unreadCountView.unreadCount = 10
-		
-		let layout = MainFeedTableViewCellLayout(cellWidth: tableView.bounds.size.width, insets: tableView.safeAreaInsets, label: titleLabel, unreadCountView: unreadCountView, showingEditingControl: false, indent: false, shouldShowDisclosure: false)
+
+		let errorIndicatorView = UIImageView()
+		errorIndicatorView.isHidden = true
+
+		let layout = MainFeedTableViewCellLayout(cellWidth: tableView.bounds.size.width, insets: tableView.safeAreaInsets, label: titleLabel, unreadCountView: unreadCountView, showingEditingControl: false, indent: false, shouldShowDisclosure: false, errorIndicatorView: errorIndicatorView)
 		tableView.estimatedRowHeight = layout.height
 	}
 	
@@ -823,17 +826,26 @@ private extension MainFeedViewController {
 		} else {
 			cell.indentationLevel = 1
 		}
-		
+
 		if let containerID = (node.representedObject as? Container)?.containerID {
 			cell.setDisclosure(isExpanded: coordinator.isExpanded(containerID), animated: false)
 			cell.isDisclosureAvailable = true
 		} else {
 			cell.isDisclosureAvailable = false
 		}
-		
+
 		if let feed = node.representedObject as? Feed {
 			cell.name = feed.nameForDisplay
 			cell.unreadCount = feed.unreadCount
+
+			// Set error count for WebFeeds
+			if let webFeed = feed as? WebFeed {
+				cell.errorCount = webFeed.consecutiveErrorCount
+			} else {
+				cell.errorCount = 0
+			}
+		} else {
+			cell.errorCount = 0
 		}
 
 		configureIcon(cell, indexPath)
@@ -844,7 +856,7 @@ private extension MainFeedViewController {
 		} else {
 			cell.isSeparatorShown = true
 		}
-		
+
 	}
 	
 	func configureIcon(_ cell: MainFeedTableViewCell, _ indexPath: IndexPath) {
