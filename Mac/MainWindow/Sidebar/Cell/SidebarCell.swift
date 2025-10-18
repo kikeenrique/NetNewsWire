@@ -49,6 +49,15 @@ final class SidebarCell : NSTableCellView {
 		}
 	}
 
+	var errorCount: Int = 0 {
+		didSet {
+			if errorCount != oldValue {
+				updateErrorIndicator()
+				needsLayout = true
+			}
+		}
+	}
+
 	var name: String {
 		get {
 			return titleView.stringValue
@@ -74,6 +83,12 @@ final class SidebarCell : NSTableCellView {
 
 	private let faviconImageView = IconView()
 	private let unreadCountView = UnreadCountView(frame: NSZeroRect)
+	private let errorIndicatorView: NSImageView = {
+		let imageView = NSImageView(frame: NSZeroRect)
+		imageView.imageScaling = .scaleProportionallyDown
+		imageView.isHidden = true
+		return imageView
+	}()
 
 	override var backgroundStyle: NSView.BackgroundStyle {
 		didSet {
@@ -106,7 +121,7 @@ final class SidebarCell : NSTableCellView {
 		guard let cellAppearance = cellAppearance else {
 			return
 		}
-		let layout = SidebarCellLayout(appearance: cellAppearance, cellSize: bounds.size, shouldShowImage: shouldShowImage, textField: titleView, unreadCountView: unreadCountView)
+		let layout = SidebarCellLayout(appearance: cellAppearance, cellSize: bounds.size, shouldShowImage: shouldShowImage, textField: titleView, unreadCountView: unreadCountView, errorIndicatorView: errorIndicatorView)
 		layoutWith(layout)
 	}
 
@@ -126,6 +141,7 @@ private extension SidebarCell {
 		addSubviewAtInit(unreadCountView)
 		addSubviewAtInit(faviconImageView)
 		addSubviewAtInit(titleView)
+		addSubviewAtInit(errorIndicatorView)
 	}
 
 	func addSubviewAtInit(_ view: NSView) {
@@ -136,12 +152,13 @@ private extension SidebarCell {
 	func layoutWith(_ layout: SidebarCellLayout) {
 		faviconImageView.setFrame(ifNotEqualTo: layout.faviconRect)
 		titleView.setFrame(ifNotEqualTo: layout.titleRect)
+		errorIndicatorView.setFrame(ifNotEqualTo: layout.errorIndicatorRect)
 		unreadCountView.setFrame(ifNotEqualTo: layout.unreadCountRect)
 	}
 	
 	func updateFaviconImage() {
 		var updatedIconImage = iconImage
-		
+
 		if let iconImage = iconImage, iconImage.isSymbol {
 			var tintColor: CGColor
 			if backgroundStyle != .normal {
@@ -162,6 +179,24 @@ private extension SidebarCell {
 			faviconImageView.iconImage = nil
 		}
 	}
-	
+
+	func updateErrorIndicator() {
+		if errorCount >= 10 {
+			// Red X for broken feeds (10+ errors)
+			let config = NSImage.SymbolConfiguration(paletteColors: [.systemRed])
+			errorIndicatorView.image = NSImage(systemSymbolName: "xmark.circle.fill", accessibilityDescription: "Broken feed")?.withSymbolConfiguration(config)
+			errorIndicatorView.isHidden = false
+		} else if errorCount >= 3 {
+			// Yellow warning for problematic feeds (3-9 errors)
+			let config = NSImage.SymbolConfiguration(paletteColors: [.systemYellow])
+			errorIndicatorView.image = NSImage(systemSymbolName: "exclamationmark.triangle.fill", accessibilityDescription: "Feed has errors")?.withSymbolConfiguration(config)
+			errorIndicatorView.isHidden = false
+		} else {
+			// No indicator for healthy feeds (0-2 errors)
+			errorIndicatorView.isHidden = true
+			errorIndicatorView.image = nil
+		}
+	}
+
 }
 
