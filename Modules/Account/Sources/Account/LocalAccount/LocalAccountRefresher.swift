@@ -108,9 +108,9 @@ extension LocalAccountRefresher: DownloadSessionDelegate {
 		feed.lastCheckDate = Date()
 
 		// Track network errors
-		guard error == nil else {
-			feed.metadata.consecutiveErrorCount += 1
-			feed.metadata.lastErrorMessage = error.localizedDescription
+		if let error = error {
+			feed.consecutiveErrorCount += 1
+			feed.lastErrorMessage = error.localizedDescription
 			return
 		}
 		guard let httpResponse = response as? HTTPURLResponse else {
@@ -122,8 +122,8 @@ extension LocalAccountRefresher: DownloadSessionDelegate {
 
 		// Track HTTP error responses
 		guard statusIsOKOrNotModified else {
-			feed.metadata.consecutiveErrorCount += 1
-			feed.metadata.lastErrorMessage = "HTTP \(httpResponse.statusCode)"
+			feed.consecutiveErrorCount += 1
+			feed.lastErrorMessage = "HTTP \(httpResponse.statusCode)"
 			return
 		}
 
@@ -135,9 +135,9 @@ extension LocalAccountRefresher: DownloadSessionDelegate {
 
 		// 304 Not Modified is a success - feed is working, just no new content
 		guard statusIsOK else {
-			feed.metadata.lastSuccessfulCheckDate = Date()
-			feed.metadata.consecutiveErrorCount = 0
-			feed.metadata.lastErrorMessage = nil
+			feed.lastSuccessfulCheckDate = Date()
+			feed.consecutiveErrorCount = 0
+			feed.lastErrorMessage = nil
 			return
 		}
 
@@ -159,8 +159,8 @@ extension LocalAccountRefresher: DownloadSessionDelegate {
 
 			let parserData = ParserData(url: feed.url, data: data)
 			guard let parsedFeed = try? await FeedParser.parse(parserData) else {
-				feed.metadata.consecutiveErrorCount += 1
-				feed.metadata.lastErrorMessage = "Failed to parse feed"
+				feed.consecutiveErrorCount += 1
+				feed.lastErrorMessage = "Failed to parse feed"
 				return
 			}
 			guard let account = feed.account else {
@@ -169,8 +169,8 @@ extension LocalAccountRefresher: DownloadSessionDelegate {
 
 			assert(Thread.isMainThread)
 			guard let articleChanges = try? await account.update(feed, with: parsedFeed) else {
-				feed.metadata.consecutiveErrorCount += 1
-				feed.metadata.lastErrorMessage = "Failed to update articles"
+				feed.consecutiveErrorCount += 1
+				feed.lastErrorMessage = "Failed to update articles"
 				return
 			}
 
@@ -178,9 +178,9 @@ extension LocalAccountRefresher: DownloadSessionDelegate {
 			feed.contentHash = dataHash
 
 			// Success! Reset error tracking
-			feed.metadata.lastSuccessfulCheckDate = Date()
-			feed.metadata.consecutiveErrorCount = 0
-			feed.metadata.lastErrorMessage = nil
+			feed.lastSuccessfulCheckDate = Date()
+			feed.consecutiveErrorCount = 0
+			feed.lastErrorMessage = nil
 
 			self.delegate?.localAccountRefresher(self, articleChanges: articleChanges)
 		}

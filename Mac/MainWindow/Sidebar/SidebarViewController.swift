@@ -803,7 +803,7 @@ private extension SidebarViewController {
 
 	func configureErrorCount(_ cell: SidebarCell, _ node: Node) {
 		if let feed = node.representedObject as? WebFeed {
-			cell.errorCount = feed.metadata.consecutiveErrorCount
+			cell.errorCount = feed.consecutiveErrorCount
 		} else {
 			cell.errorCount = 0
 		}
