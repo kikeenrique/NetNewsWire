@@ -28,6 +28,7 @@ public extension WebFeed {
 		public static let contentHash = "contentHash"
 		public static let conditionalGetInfo = "conditionalGetInfo"
 		public static let cacheControlInfo = "cacheControlInfo"
+		public static let consecutiveErrorCount = "consecutiveErrorCount"
 	}
 }
 

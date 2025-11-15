@@ -160,7 +160,7 @@ final class MainFeedViewController: UITableViewController, UndoableCommandRunner
 		guard let webFeed = note.object as? WebFeed, let key = note.userInfo?[WebFeed.WebFeedSettingUserInfoKey] as? String else {
 			return
 		}
-		if key == WebFeed.WebFeedSettingKey.homePageURL || key == WebFeed.WebFeedSettingKey.faviconURL {
+		if key == WebFeed.WebFeedSettingKey.homePageURL || key == WebFeed.WebFeedSettingKey.faviconURL || key == WebFeed.WebFeedSettingKey.consecutiveErrorCount {
 			configureCellsForRepresentedObject(webFeed)
 		}
 	}
