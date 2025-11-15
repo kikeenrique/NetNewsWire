@@ -127,6 +127,14 @@ final class WebFeedInspectorViewController: UITableViewController {
 	/// conditions that may require the tableView to be
 	/// displayed differently than what is setup in the storyboard.
 	private func shift(_ section: Int) -> Int {
+		let currentNumberOfSections = numberOfSections(in: tableView)
+
+		// Health section is always the last section when visible
+		if shouldShowHealthSection && section == currentNumberOfSections - 1 {
+			return 3 // Health section is section 3 in storyboard
+		}
+
+		// Handle home page section hiding
 		if section >= homePageIndexPath.section && shouldHideHomePageSection {
 			return section + 1
 		}
@@ -246,7 +254,10 @@ extension WebFeedInspectorViewController {
 		let errorCount = webFeed.consecutiveErrorCount
 
 		// Status
-		if errorCount >= 10 {
+		if errorCount == 0 {
+			healthStatusLabel.text = "Status: Healthy"
+			healthStatusLabel.textColor = .systemGreen
+		} else if errorCount >= 10 {
 			healthStatusLabel.text = "Status: Broken"
 			healthStatusLabel.textColor = .systemRed
 		} else if errorCount >= 3 {
@@ -282,7 +293,7 @@ extension WebFeedInspectorViewController {
 	}
 
 	private var shouldShowHealthSection: Bool {
-		return webFeed.consecutiveErrorCount > 0
+		return true
 	}
 
 }
