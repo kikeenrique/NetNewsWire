@@ -343,6 +343,55 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
+                            <tableViewSection headerTitle="Feed Health" id="HlT-9d-8fQ">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="xQm-7P-fLc">
+                                        <rect key="frame" x="20" y="361.5" width="374" height="100"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="xQm-7P-fLc" id="k8Y-hd-9gE">
+                                            <rect key="frame" x="0.0" y="0.0" width="374" height="100"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="Zqw-Bt-hKd">
+                                                    <rect key="frame" x="20" y="12" width="334" height="76"/>
+                                                    <subviews>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Status" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hPQ-8t-Kna">
+                                                            <rect key="frame" x="0.0" y="0.0" width="334" height="17"/>
+                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleSubheadline"/>
+                                                            <color key="textColor" systemColor="secondaryLabelColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Last successful update" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="N9V-vg-rZg">
+                                                            <rect key="frame" x="0.0" y="21" width="334" height="14.5"/>
+                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
+                                                            <color key="textColor" systemColor="secondaryLabelColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Consecutive errors" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Bgf-HE-8nH">
+                                                            <rect key="frame" x="0.0" y="39.5" width="334" height="14.5"/>
+                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
+                                                            <color key="textColor" systemColor="secondaryLabelColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Last error" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9kL-Ru-y7E">
+                                                            <rect key="frame" x="0.0" y="58" width="334" height="29"/>
+                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
+                                                            <color key="textColor" systemColor="secondaryLabelColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                    </subviews>
+                                                </stackView>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="Zqw-Bt-hKd" firstAttribute="top" secondItem="k8Y-hd-9gE" secondAttribute="top" constant="12" id="7bg-Hb-9nQ"/>
+                                                <constraint firstItem="Zqw-Bt-hKd" firstAttribute="leading" secondItem="k8Y-hd-9gE" secondAttribute="leading" constant="20" id="Jgd-cR-eCy"/>
+                                                <constraint firstAttribute="trailing" secondItem="Zqw-Bt-hKd" secondAttribute="trailing" constant="20" id="aJ2-DQ-bEU"/>
+                                                <constraint firstAttribute="bottom" secondItem="Zqw-Bt-hKd" secondAttribute="bottom" constant="12" id="wE2-9u-eqB"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
                         </sections>
                         <connections>
                             <outlet property="dataSource" destination="lEH-bG-pQW" id="B83-a4-nKt"/>
@@ -358,8 +407,12 @@
                     </navigationItem>
                     <connections>
                         <outlet property="alwaysShowReaderViewSwitch" destination="fUd-JB-UMK" id="kUh-ob-Ego"/>
+                        <outlet property="errorCountLabel" destination="Bgf-HE-8nH" id="Kwd-Jy-3fN"/>
                         <outlet property="feedURLLabel" destination="rOV-XS-bNW" id="mPv-yb-H4I"/>
+                        <outlet property="healthStatusLabel" destination="hPQ-8t-Kna" id="9xC-hF-ZeK"/>
                         <outlet property="homePageLabel" destination="HUP-Cu-FGT" id="EDm-vt-2r0"/>
+                        <outlet property="lastErrorLabel" destination="9kL-Ru-y7E" id="P7Q-kW-Nbc"/>
+                        <outlet property="lastSuccessLabel" destination="N9V-vg-rZg" id="8gR-3v-qYf"/>
                         <outlet property="nameTextField" destination="ZdA-rl-9eP" id="GzR-uc-fpV"/>
                         <outlet property="notifyAboutNewArticlesSwitch" destination="g39-wK-xUs" id="ahS-ZK-6xN"/>
                     </connections>
@@ -413,6 +466,9 @@
         <namedColor name="secondaryAccentColor">
             <color red="0.031372549019607843" green="0.41568627450980394" blue="0.93333333333333335" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
+        <systemColor name="secondaryLabelColor">
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
         <systemColor name="systemRedColor">
             <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
