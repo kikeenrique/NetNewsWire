@@ -19,12 +19,10 @@ final class WebFeedInspectorViewController: NSViewController, Inspector {
 	@IBOutlet weak var urlTextField: NSTextField?
 	@IBOutlet weak var isNotifyAboutNewArticlesCheckBox: NSButton!
 	@IBOutlet weak var isReaderViewAlwaysOnCheckBox: NSButton?
-
-	private var healthSectionView: NSStackView?
-	private var healthStatusLabel: NSTextField?
-	private var lastSuccessLabel: NSTextField?
-	private var errorCountLabel: NSTextField?
-	private var lastErrorLabel: NSTextField?
+	@IBOutlet weak var healthStatusLabel: NSTextField?
+	@IBOutlet weak var lastSuccessLabel: NSTextField?
+	@IBOutlet weak var errorCountLabel: NSTextField?
+	@IBOutlet weak var lastErrorLabel: NSTextField?
 
 	private var feed: WebFeed? {
 		didSet {
@@ -54,7 +52,6 @@ final class WebFeedInspectorViewController: NSViewController, Inspector {
 	// MARK: NSViewController
 
 	override func viewDidLoad() {
-		setupHealthSection()
 		updateUI()
 		NotificationCenter.default.addObserver(self, selector: #selector(imageDidBecomeAvailable(_:)), name: .ImageDidBecomeAvailable, object: nil)
 		NotificationCenter.default.addObserver(self, selector: #selector(updateUI), name: .DidUpdateFeedPreferencesFromContextMenu, object: nil)
@@ -227,68 +224,8 @@ private extension WebFeedInspectorViewController {
 		}
 	}
 
-	func setupHealthSection() {
-		// Create health section stack view
-		let stackView = NSStackView()
-		stackView.orientation = .vertical
-		stackView.alignment = .leading
-		stackView.spacing = 4
-		stackView.translatesAutoresizingMaskIntoConstraints = false
-
-		// Title label
-		let titleLabel = NSTextField(labelWithString: "Feed Health")
-		titleLabel.font = NSFont.systemFont(ofSize: NSFont.systemFontSize, weight: .semibold)
-
-		// Status label
-		let statusLabel = NSTextField(labelWithString: "")
-		statusLabel.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
-		statusLabel.textColor = .secondaryLabelColor
-
-		// Last success label
-		let successLabel = NSTextField(labelWithString: "")
-		successLabel.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
-		successLabel.textColor = .secondaryLabelColor
-
-		// Error count label
-		let errCountLabel = NSTextField(labelWithString: "")
-		errCountLabel.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
-		errCountLabel.textColor = .secondaryLabelColor
-
-		// Last error label
-		let errLabel = NSTextField(labelWithString: "")
-		errLabel.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
-		errLabel.textColor = .secondaryLabelColor
-		errLabel.lineBreakMode = .byWordWrapping
-		errLabel.maximumNumberOfLines = 2
-
-		stackView.addArrangedSubview(titleLabel)
-		stackView.addArrangedSubview(statusLabel)
-		stackView.addArrangedSubview(successLabel)
-		stackView.addArrangedSubview(errCountLabel)
-		stackView.addArrangedSubview(errLabel)
-
-		// Add to view hierarchy - append at bottom
-		view.addSubview(stackView)
-		NSLayoutConstraint.activate([
-			stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-			stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-			stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20)
-		])
-
-		// Store references
-		healthSectionView = stackView
-		healthStatusLabel = statusLabel
-		lastSuccessLabel = successLabel
-		errorCountLabel = errCountLabel
-		lastErrorLabel = errLabel
-
-		// Initially hidden
-		stackView.isHidden = true
-	}
-
 	func updateHealthSection() {
 		guard let feed = feed,
-			  let healthSectionView = healthSectionView,
 			  let healthStatusLabel = healthStatusLabel,
 			  let lastSuccessLabel = lastSuccessLabel,
 			  let errorCountLabel = errorCountLabel,
@@ -298,16 +235,11 @@ private extension WebFeedInspectorViewController {
 
 		let errorCount = feed.consecutiveErrorCount
 
-		// Only show health section if there are errors
-		guard errorCount > 0 else {
-			healthSectionView.isHidden = true
-			return
-		}
-
-		healthSectionView.isHidden = false
-
 		// Status
-		if errorCount >= 10 {
+		if errorCount == 0 {
+			healthStatusLabel.stringValue = "Status: Healthy"
+			healthStatusLabel.textColor = .systemGreen
+		} else if errorCount >= 10 {
 			healthStatusLabel.stringValue = "Status: Broken"
 			healthStatusLabel.textColor = .systemRed
 		} else if errorCount >= 3 {
