@@ -784,6 +784,12 @@ private extension MainTimelineViewController {
 	func updateTitleUnreadCount() {
 		if let titleView = navigationItem.titleView as? MainTimelineTitleView {
 			titleView.unreadCountView?.unreadCount = coordinator?.timelineUnreadCount ?? 0
+			// Update error count if viewing a WebFeed
+			if let webFeed = timelineFeed as? WebFeed {
+				titleView.errorCount = webFeed.consecutiveErrorCount
+			} else {
+				titleView.errorCount = 0
+			}
 		}
 	}
 	

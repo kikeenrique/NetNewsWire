@@ -32,22 +32,32 @@
                         <constraint firstAttribute="height" constant="20" id="VUB-ip-zXU"/>
                     </constraints>
                 </view>
+                <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7Hq-8N-dFe">
+                    <rect key="frame" x="155.5" y="11" width="16" height="16"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="16" id="9Zx-eH-gKh"/>
+                        <constraint firstAttribute="height" constant="16" id="hLp-dY-3eU"/>
+                    </constraints>
+                </imageView>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstItem="5gI-Wl-lnK" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="1Yh-ha-Pu8"/>
                 <constraint firstItem="5F6-2v-qSS" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="CeZ-D5-NOV"/>
-                <constraint firstItem="z9o-XA-3t4" firstAttribute="leading" secondItem="5F6-2v-qSS" secondAttribute="trailing" constant="8" symbolic="YES" id="CiV-5P-T1S"/>
                 <constraint firstAttribute="trailing" secondItem="z9o-XA-3t4" secondAttribute="trailing" id="OVL-Ac-Rtt"/>
                 <constraint firstItem="z9o-XA-3t4" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="ZkY-jG-eZO"/>
                 <constraint firstItem="5gI-Wl-lnK" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="eQU-mX-qmd"/>
                 <constraint firstItem="5F6-2v-qSS" firstAttribute="leading" secondItem="5gI-Wl-lnK" secondAttribute="trailing" constant="8" id="fVr-vW-alg"/>
+                <constraint firstItem="7Hq-8N-dFe" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="5F6-2v-qSS" secondAttribute="trailing" constant="8" id="dT6-Lw-9Nc"/>
+                <constraint firstItem="z9o-XA-3t4" firstAttribute="leading" secondItem="7Hq-8N-dFe" secondAttribute="trailing" constant="4" id="gN8-vZ-hTc"/>
+                <constraint firstItem="7Hq-8N-dFe" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="kL9-pY-2Xh"/>
             </constraints>
             <nil key="simulatedTopBarMetrics"/>
             <nil key="simulatedBottomBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
+                <outlet property="errorIndicatorView" destination="7Hq-8N-dFe" id="8Kf-Nx-9Lm"/>
                 <outlet property="iconView" destination="5gI-Wl-lnK" id="IiR-qS-d22"/>
                 <outlet property="label" destination="5F6-2v-qSS" id="ec7-8Y-PRv"/>
                 <outlet property="unreadCountView" destination="z9o-XA-3t4" id="JBy-aa-feL"/>

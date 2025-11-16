@@ -13,6 +13,15 @@ final class MainTimelineTitleView: UIView {
 	@IBOutlet var iconView: IconView?
 	@IBOutlet var label: UILabel?
 	@IBOutlet var unreadCountView: MainTimelineUnreadCountView?
+	@IBOutlet var errorIndicatorView: UIImageView?
+
+	var errorCount: Int = 0 {
+		didSet {
+			if errorCount != oldValue {
+				updateErrorIndicator()
+			}
+		}
+	}
 
 	@available(iOS 13.4, *)
 	private lazy var pointerInteraction: UIPointerInteraction = {
@@ -47,7 +56,25 @@ final class MainTimelineTitleView: UIView {
 			removeInteraction(pointerInteraction)
 		}
 	}
-	
+
+	private func updateErrorIndicator() {
+		if errorCount >= 10 {
+			// Red X for broken feeds (10+ errors)
+			let config = UIImage.SymbolConfiguration(paletteColors: [.systemRed])
+			errorIndicatorView?.image = UIImage(systemName: "xmark.circle.fill", withConfiguration: config)
+			errorIndicatorView?.isHidden = false
+		} else if errorCount >= 3 {
+			// Yellow warning for problematic feeds (3-9 errors)
+			let config = UIImage.SymbolConfiguration(paletteColors: [.systemYellow])
+			errorIndicatorView?.image = UIImage(systemName: "exclamationmark.triangle.fill", withConfiguration: config)
+			errorIndicatorView?.isHidden = false
+		} else {
+			// No indicator for healthy feeds (0-2 errors)
+			errorIndicatorView?.isHidden = true
+			errorIndicatorView?.image = nil
+		}
+	}
+
 }
 
 extension MainTimelineTitleView: UIPointerInteractionDelegate {

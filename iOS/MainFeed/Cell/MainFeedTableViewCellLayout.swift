@@ -60,25 +60,25 @@ struct MainFeedTableViewCellLayout {
 			rFavicon = CGRect(x: x, y: y, width: MainFeedTableViewCellLayout.imageSize.width, height: MainFeedTableViewCellLayout.imageSize.height)
 		}
 
-		// Error Indicator (next to unread count, on the right)
-		let errorIndicatorIsHidden = errorIndicatorView.isHidden
-		var rErrorIndicator = CGRect.zero
-		if !errorIndicatorIsHidden {
-			rErrorIndicator.size = MainFeedTableViewCellLayout.errorIndicatorSize
-			rErrorIndicator.origin.x = bounds.maxX - (MainFeedTableViewCellLayout.unreadCountMarginRight + MainFeedTableViewCellLayout.errorIndicatorSize.width)
-		}
-
-		// Unread Count (to the left of error indicator)
+		// Unread Count (rightmost)
 		let unreadCountSize = unreadCountView.contentSize
 		let unreadCountIsHidden = unreadCountView.unreadCount < 1
 
 		var rUnread = CGRect.zero
 		if !unreadCountIsHidden {
 			rUnread.size = unreadCountSize
-			if !errorIndicatorIsHidden {
-				rUnread.origin.x = rErrorIndicator.minX - MainFeedTableViewCellLayout.errorIndicatorMarginRight - unreadCountSize.width
+			rUnread.origin.x = bounds.maxX - (MainFeedTableViewCellLayout.unreadCountMarginRight + unreadCountSize.width)
+		}
+
+		// Error Indicator (to the left of unread count)
+		let errorIndicatorIsHidden = errorIndicatorView.isHidden
+		var rErrorIndicator = CGRect.zero
+		if !errorIndicatorIsHidden {
+			rErrorIndicator.size = MainFeedTableViewCellLayout.errorIndicatorSize
+			if !unreadCountIsHidden {
+				rErrorIndicator.origin.x = rUnread.minX - MainFeedTableViewCellLayout.errorIndicatorMarginRight - MainFeedTableViewCellLayout.errorIndicatorSize.width
 			} else {
-				rUnread.origin.x = bounds.maxX - (MainFeedTableViewCellLayout.unreadCountMarginRight + unreadCountSize.width)
+				rErrorIndicator.origin.x = bounds.maxX - (MainFeedTableViewCellLayout.unreadCountMarginRight + MainFeedTableViewCellLayout.errorIndicatorSize.width)
 			}
 		}
 		
