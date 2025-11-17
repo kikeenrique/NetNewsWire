@@ -55,6 +55,7 @@ final class WebFeedInspectorViewController: NSViewController, Inspector {
 		updateUI()
 		NotificationCenter.default.addObserver(self, selector: #selector(imageDidBecomeAvailable(_:)), name: .ImageDidBecomeAvailable, object: nil)
 		NotificationCenter.default.addObserver(self, selector: #selector(updateUI), name: .DidUpdateFeedPreferencesFromContextMenu, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(webFeedSettingDidChange(_:)), name: .WebFeedSettingDidChange, object: nil)
 	}
 	
 	override func viewDidAppear() {
@@ -113,7 +114,20 @@ final class WebFeedInspectorViewController: NSViewController, Inspector {
 	@objc func imageDidBecomeAvailable(_ note: Notification) {
 		updateImage()
 	}
-	
+
+	@objc func webFeedSettingDidChange(_ note: Notification) {
+		guard let feed = feed,
+			  let noteWebFeed = note.object as? WebFeed,
+			  feed == noteWebFeed,
+			  let key = note.userInfo?[WebFeed.WebFeedSettingUserInfoKey] as? String else {
+			return
+		}
+
+		if key == WebFeed.WebFeedSettingKey.consecutiveErrorCount {
+			updateHealthSection()
+		}
+	}
+
 }
 
 extension WebFeedInspectorViewController: NSTextFieldDelegate {

@@ -57,6 +57,8 @@ final class WebFeedInspectorViewController: UITableViewController {
 
 		NotificationCenter.default.addObserver(self, selector: #selector(updateNotificationSettings), name: UIApplication.willEnterForegroundNotification, object: nil)
 
+		NotificationCenter.default.addObserver(self, selector: #selector(webFeedSettingDidChange(_:)), name: .WebFeedSettingDidChange, object: nil)
+
 	}
 
 	override func viewWillAppear(_ animated: Bool) {
@@ -80,7 +82,19 @@ final class WebFeedInspectorViewController: UITableViewController {
 	@objc func webFeedIconDidBecomeAvailable(_ notification: Notification) {
 		headerView?.iconView.iconImage = iconImage
 	}
-	
+
+	@objc func webFeedSettingDidChange(_ notification: Notification) {
+		guard let noteWebFeed = notification.object as? WebFeed,
+			  webFeed == noteWebFeed,
+			  let key = notification.userInfo?[WebFeed.WebFeedSettingUserInfoKey] as? String else {
+			return
+		}
+
+		if key == WebFeed.WebFeedSettingKey.consecutiveErrorCount {
+			updateHealthSection()
+		}
+	}
+
 	@IBAction func notifyAboutNewArticlesChanged(_ sender: Any) {
 		guard let settings = userNotificationSettings else {
 			notifyAboutNewArticlesSwitch.isOn = !notifyAboutNewArticlesSwitch.isOn
